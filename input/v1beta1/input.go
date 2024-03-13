@@ -21,13 +21,8 @@ type Object struct {
 	Suffix    string `json:"suffix,omitempty"`
 }
 
-type RandomString struct {
-	Length int `json:"length"`
-}
-
 type Config struct {
-	Objs    []Object     `json:"objs"`
-	RandStr RandomString `json:"randStr,omitempty"`
+	Objs []Object `json:"objs"`
 }
 
 // RandomGen can be used to provide input to this Function.
