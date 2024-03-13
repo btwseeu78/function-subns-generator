@@ -11,14 +11,14 @@ import (
 // This isn't a custom resource, in the sense that we never install its CRD.
 // It is a KRM-like object, so we generate a CRD to describe its schema.
 
-// TODO: Add your input type here! It doesn't need to be called 'Input', you can
+// TODO: Add your input type here! It doesn't need to be called 'RandomGen', you can
 // rename it to anything you like.
 
-// Input can be used to provide input to this Function.
+// RandomGen can be used to provide input to this Function.
 // +kubebuilder:object:root=true
 // +kubebuilder:storageversion
 // +kubebuilder:resource:categories=crossplane
-type Input struct {
+type RandomGen struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
