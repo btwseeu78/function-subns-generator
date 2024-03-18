@@ -1,0 +1,35 @@
+apiVersion: apiextensions.crossplane.io/v1
+kind: CompositeResourceDefinition
+metadata:
+  name: xmyspaces.arpan.io
+spec:
+  defaultCompositionRef:
+    name: myspacecomposition
+  group: arpan.io
+  names:
+    kind: XMySpace
+    plural: xmyspaces
+  claimNames:
+    kind: MySpace
+    plural: myspaces
+  versions:
+    - name: v1alpha1
+      served: true
+      referenceable: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              properties:
+                name:
+                  type: string
+              required:
+                - name
+            status:
+              type: object
+              properties:
+                ready:
+                  type: string
+                  nullable: true
