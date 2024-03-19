@@ -9,3 +9,14 @@ metadata:
 spec:
   # This is ignored when using the Development runtime.
   package: function-subns-generator
+...
+---
+apiVersion: pkg.crossplane.io/v1beta1
+kind: Function
+metadata:
+  name: function-patch-and-transform
+  annotations:
+    render.crossplane.io/runtime: Docker
+spec:
+  package: xpkg.upbound.io/crossplane-contrib/function-patch-and-transform:v0.1.4
+...

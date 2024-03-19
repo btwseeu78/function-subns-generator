@@ -13,6 +13,7 @@ import (
 	"github.com/crossplane/function-sdk-go/response"
 	"github.com/crossplane/function-subns-generator/input/v1beta1"
 	uuid2 "github.com/google/uuid"
+	"k8s.io/apimachinery/pkg/runtime"
 )
 
 // Function returns whatever response you ask it to.
@@ -50,9 +51,10 @@ func (f *Function) RunFunction(_ context.Context, req *fnv1beta1.RunFunctionRequ
 
 	id := uuid2.New().String()
 
-	f.log.Info("Genrated UUID FOR", "Observed", observed, "UUID", id)
+	f.log.Info("Generated UUID FOR", "Observed", observed, "UUID", id)
 
 	for _, obj := range in.Cfg.Objs {
+		f.log.Info("Name Of The Object", "object is", obj, "Name", obj.Name)
 		f.log.Info("Name Of The Block We are parsing", "Observed: ", observed, "Resource: ", observed[resource.Name(obj.Name)].Resource)
 
 		if observed[resource.Name(obj.Name)].Resource != nil {
@@ -70,7 +72,31 @@ func (f *Function) RunFunction(_ context.Context, req *fnv1beta1.RunFunctionRequ
 			fmt.Println(getFieldPath)
 
 		}
+		if observed[resource.Name(obj.Name)].Resource == nil {
+			err := patchFieldValueToObject(obj.FieldPath, id, desired[resource.Name(obj.Name)].Resource)
+			if err != nil {
+				f.log.Info("Unable To generate the unstructured conversion", "observed", observed[resource.Name(obj.Name)].Resource, "err", err)
+				return rsp, err
+			}
+		}
+		err := response.SetDesiredComposedResources(rsp, desired)
+
+		if err != nil {
+			f.log.Info("Creating Desired resource failed", "desired", desired, "error", err)
+		}
+
 	}
 
 	return rsp, nil
+}
+
+func patchFieldValueToObject(fpath string, id string, to runtime.Object) error {
+	paved, err := fieldpath.PaveObject(to)
+	if err != nil {
+		return err
+	}
+	if err := paved.SetValue(fpath, id); err != nil {
+		return err
+	}
+	return runtime.DefaultUnstructuredConverter.FromUnstructured(paved.UnstructuredContent(), to)
 }

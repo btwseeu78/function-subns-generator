@@ -1,0 +1,7 @@
+apiVersion: secrets.renault.com/v1alpha1
+kind: XMySpace
+metadata:
+  name: myapp
+spec:
+  data: {}
+status: {}
