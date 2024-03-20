@@ -10,6 +10,7 @@ require (
 	github.com/crossplane/function-sdk-go v0.2.0
 	github.com/google/go-cmp v0.6.0
 	github.com/google/uuid v1.4.0
+	github.com/hashicorp/packer-plugin-sdk v0.5.2
 	google.golang.org/protobuf v1.32.0
 	k8s.io/apimachinery v0.29.2
 	sigs.k8s.io/controller-tools v0.14.0
@@ -17,7 +18,7 @@ require (
 
 require (
 	dario.cat/mergo v1.0.0 // indirect
-	github.com/davecgh/go-spew v1.1.1 // indirect
+	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/emicklei/go-restful/v3 v3.11.0 // indirect
 	github.com/evanphx/json-patch/v5 v5.8.0 // indirect
 	github.com/fatih/color v1.16.0 // indirect

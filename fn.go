@@ -12,7 +12,7 @@ import (
 	"github.com/crossplane/function-sdk-go/resource"
 	"github.com/crossplane/function-sdk-go/response"
 	"github.com/crossplane/function-subns-generator/input/v1beta1"
-	uuid2 "github.com/google/uuid"
+	"github.com/hashicorp/packer-plugin-sdk/random"
 	"k8s.io/apimachinery/pkg/runtime"
 )
 
@@ -29,6 +29,7 @@ func (f *Function) RunFunction(_ context.Context, req *fnv1beta1.RunFunctionRequ
 
 	rsp := response.To(req, response.DefaultTTL)
 
+	randum := random.AlphaNumLower(20)
 	in := &v1beta1.RandomGen{}
 	if err := request.GetInput(req, in); err != nil {
 		response.Fatal(rsp, errors.Wrapf(err, "cannot get Function input from %T", req))
@@ -49,14 +50,13 @@ func (f *Function) RunFunction(_ context.Context, req *fnv1beta1.RunFunctionRequ
 	}
 	f.log.Info("DesiredComposed Resource", "Observed: ", observed, "Req: ", req.GetMeta().GetTag())
 
-	id := uuid2.New().String()
+	// id := uuid2.New().String()
 
-	f.log.Info("Generated UUID FOR", "Observed", observed, "UUID", id)
+	// f.log.Info("Generated UUID FOR", "Observed", observed, "UUID", id)
 
 	for _, obj := range in.Cfg.Objs {
-		f.log.Info("Name Of The Object", "object is", obj, "Name", obj.Name)
-		f.log.Info("Name Of The Block We are parsing", "Observed: ", observed, "Resource: ", observed[resource.Name(obj.Name)].Resource)
 
+		f.log.Info("Validate Input", "name", obj.Name, "suffix", obj.Suffix, "prefix", obj.Prefix)
 		if observed[resource.Name(obj.Name)].Resource != nil {
 			observedPaved, err := fieldpath.PaveObject(observed[resource.Name(obj.Name)].Resource)
 			if err != nil {
@@ -73,7 +73,7 @@ func (f *Function) RunFunction(_ context.Context, req *fnv1beta1.RunFunctionRequ
 
 		}
 		if observed[resource.Name(obj.Name)].Resource == nil {
-			err := patchFieldValueToObject(obj.FieldPath, id, desired[resource.Name(obj.Name)].Resource)
+			err := patchFieldValueToObject(obj.FieldPath, obj.Name+"-"+randum, desired[resource.Name(obj.Name)].Resource)
 			if err != nil {
 				f.log.Info("Unable To generate the unstructured conversion", "observed", observed[resource.Name(obj.Name)].Resource, "err", err)
 				return rsp, err

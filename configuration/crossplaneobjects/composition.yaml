@@ -26,16 +26,16 @@ spec:
               manifest:
                 apiVersion: v1
                 kind: Namespace
-          patches:
-          - type: FromCompositeFieldPath
-            fromFieldPath: spec.name
-            toFieldPath: spec.forProvider.manifest.metadata.name
-          - type: FromCompositeFieldPath
-            fromFieldPath: metadata.labels['crossplane.io/claim-name']
-            toFieldPath: metadata.name
-          - type: FromCompositeFieldPath
-            fromFieldPath: metadata.labels['crossplane.io/claim-namespace']
-            toFieldPath: metadata.namespace
+        patches:
+        - type: FromCompositeFieldPath
+          fromFieldPath: spec.name
+          toFieldPath: spec.forProvider.manifest.metadata.name
+        - type: FromCompositeFieldPath
+          fromFieldPath: metadata.labels['crossplane.io/claim-name']
+          toFieldPath: metadata.name
+        - type: FromCompositeFieldPath
+          fromFieldPath: metadata.labels['crossplane.io/claim-namespace']
+          toFieldPath: metadata.namespace
   - step: generate-name
     functionRef:
       name: function-subns-generator
@@ -45,4 +45,4 @@ spec:
       cfg:
         objs:
         - name: customspace
-          fieldPath: "metadata.name"
+          fieldPath: "spec.forProvider.metadata.name"
