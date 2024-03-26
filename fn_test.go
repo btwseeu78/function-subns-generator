@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"github.com/crossplane/crossplane-runtime/pkg/errors"
 	"strings"
 	"testing"
 
@@ -51,11 +50,10 @@ func TestRunFunction(t *testing.T) {
 					Results: []*fnv1beta1.Result{
 						{
 							Severity: fnv1beta1.Severity_SEVERITY_FATAL,
-							Message:  strings.Join([]string{"cannot get Function input from *v1beta1.RunFunctionRequest: cann", "ot get Function input %T from %T, into, req: cannot unmarshal JS", "ON from *structpb.Struct into *v1beta1.RandomGen: json: cannot u", "nmarshal JSON string into Go value of type v1beta1.Config"}, ""),
+							Message:  strings.Join([]string{"cannot get Function input from *v1beta1.RunFunctionRequest: cann", "ot get Function input %T from %T, into, req: cannot unmarshal JS", "ON from *structpb.Struct into *v1beta1.RandomGen: json: unable to u", "nmarshal JSON string into Go value of type v1beta1.Config"}, ""),
 						},
 					},
 				},
-				err: errors.New(strings.Join([]string{"cannot get Function input from *v1beta1.RunFunctionRequest: cann", "ot get Function input %T from %T, into, req: cannot unmarshal JS", "ON from *structpb.Struct into *v1beta1.RandomGen: json: cannot u", "nmarshal JSON string into Go value of type v1beta1.Config"}, "")),
 			},
 		},
 	}
