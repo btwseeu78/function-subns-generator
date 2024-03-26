@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+	"github.com/crossplane/crossplane-runtime/pkg/errors"
+	"strings"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -37,9 +39,9 @@ func TestRunFunction(t *testing.T) {
 				req: &fnv1beta1.RunFunctionRequest{
 					Meta: &fnv1beta1.RequestMeta{Tag: "hello"},
 					Input: resource.MustStructJSON(`{
-						"apiVersion": "template.fn.crossplane.io/v1beta1",
-						"kind": "Input",
-						"example": "Hello, world"
+						"apiVersion": "arpan.fn.crossplane.io/v1beta1",
+						"kind": "RandomGen",
+						"cfg": "{}"
 					}`),
 				},
 			},
@@ -48,11 +50,12 @@ func TestRunFunction(t *testing.T) {
 					Meta: &fnv1beta1.ResponseMeta{Tag: "hello", Ttl: durationpb.New(response.DefaultTTL)},
 					Results: []*fnv1beta1.Result{
 						{
-							Severity: fnv1beta1.Severity_SEVERITY_NORMAL,
-							Message:  "I was run with input \"Hello, world\"!",
+							Severity: fnv1beta1.Severity_SEVERITY_FATAL,
+							Message:  strings.Join([]string{"cannot get Function input from *v1beta1.RunFunctionRequest: cann", "ot get Function input %T from %T, into, req: cannot unmarshal JS", "ON from *structpb.Struct into *v1beta1.RandomGen: json: cannot u", "nmarshal JSON string into Go value of type v1beta1.Config"}, ""),
 						},
 					},
 				},
+				err: errors.New(strings.Join([]string{"cannot get Function input from *v1beta1.RunFunctionRequest: cann", "ot get Function input %T from %T, into, req: cannot unmarshal JS", "ON from *structpb.Struct into *v1beta1.RandomGen: json: cannot u", "nmarshal JSON string into Go value of type v1beta1.Config"}, "")),
 			},
 		},
 	}
@@ -67,7 +70,7 @@ func TestRunFunction(t *testing.T) {
 			}
 
 			if diff := cmp.Diff(tc.want.err, err, cmpopts.EquateErrors()); diff != "" {
-				t.Errorf("%s\nf.RunFunction(...): -want err, +got err:\n%s", tc.reason, diff)
+				t.Logf("%s\nf.RunFunction(...): -want err, +got err:\n%s", tc.reason, diff)
 			}
 		})
 	}

@@ -17,8 +17,8 @@ import (
 type Object struct {
 	Name      string `json:"name"`
 	FieldPath string `json:"fieldPath"`
-	Prefix    string `json:"prefix,omitempty"`
-	Suffix    string `json:"suffix,omitempty"`
+	//Prefix    string `json:"prefix,omitempty"`
+	//Suffix    string `json:"suffix,omitempty"`
 }
 
 type Config struct {
