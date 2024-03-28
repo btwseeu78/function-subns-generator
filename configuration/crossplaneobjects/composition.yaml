@@ -45,4 +45,5 @@ spec:
       cfg:
         objs:
         - name: customspace
-          fieldPath: "spec.forProvider.metadata.name"
+          fieldPath:
+          - "spec.forProvider.metadata.name"

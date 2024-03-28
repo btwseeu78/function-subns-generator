@@ -36,7 +36,9 @@ spec:
                 items:
                   properties:
                     fieldPath:
-                      type: string
+                      items:
+                        type: string
+                      type: array
                     name:
                       type: string
                   required:

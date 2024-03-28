@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"github.com/crossplane/crossplane-runtime/pkg/errors"
 	"github.com/crossplane/crossplane-runtime/pkg/fieldpath"
 	"github.com/crossplane/crossplane-runtime/pkg/logging"
@@ -55,40 +54,39 @@ func (f *Function) RunFunction(_ context.Context, req *fnv1beta1.RunFunctionRequ
 	// f.log.Info("Generated UUID FOR", "Observed", observed, "UUID", id)
 
 	for _, obj := range in.Cfg.Objs {
-		if observed[resource.Name(obj.Name)].Resource != nil {
-			observedPaved, err := fieldpath.PaveObject(observed[resource.Name(obj.Name)].Resource)
-			if err != nil {
-				f.log.Info("Unable to convert to paved object", "Observed", observed, "error: ", err)
-				response.Fatal(rsp, err)
-				return rsp, nil
-			}
-			getFieldPath, err := observedPaved.GetString(obj.FieldPath)
+		for _, fp := range obj.FieldPath {
+			if observed[resource.Name(obj.Name)].Resource != nil {
+				observedPaved, err := fieldpath.PaveObject(observed[resource.Name(obj.Name)].Resource)
+				if err != nil {
+					f.log.Info("Unable to convert to paved object", "Observed", observed, "error: ", err)
+					response.Fatal(rsp, err)
+					return rsp, nil
+				}
 
-			if err != nil {
-				f.log.Info("Unable To Get The Required Field Path", "PavedData:", observedPaved, "FieldPath", obj.FieldPath)
-				response.Fatal(rsp, err)
-				return rsp, nil
-			}
-			fmt.Println(getFieldPath)
+				if err != nil {
+					f.log.Info("Unable To Get The Required Field Path", "PavedData:", observedPaved, "FieldPath", obj.FieldPath)
+					response.Fatal(rsp, err)
+					return rsp, nil
+				}
 
-		}
-		if observed[resource.Name(obj.Name)].Resource == nil {
-			err := patchFieldValueToObject(obj.FieldPath, obj.Name+"-"+randomAlphaNum, desired[resource.Name(obj.Name)].Resource)
+			}
+			if observed[resource.Name(obj.Name)].Resource == nil {
+				err := patchFieldValueToObject(fp, obj.Name+"-"+randomAlphaNum, desired[resource.Name(obj.Name)].Resource)
+
+				if err != nil {
+					response.Warning(rsp, err)
+					f.log.Info("Unable To generate the unstructured conversion", "observed", observed[resource.Name(obj.Name)].Resource, "err", err)
+					return rsp, nil
+				}
+			}
+			err := response.SetDesiredComposedResources(rsp, desired)
 
 			if err != nil {
 				response.Warning(rsp, err)
-				f.log.Info("Unable To generate the unstructured conversion", "observed", observed[resource.Name(obj.Name)].Resource, "err", err)
+				f.log.Info("Creating Desired resource failed", "desired", desired, "error", err)
 				return rsp, nil
 			}
 		}
-		err := response.SetDesiredComposedResources(rsp, desired)
-
-		if err != nil {
-			response.Warning(rsp, err)
-			f.log.Info("Creating Desired resource failed", "desired", desired, "error", err)
-			return rsp, nil
-		}
-
 	}
 
 	return rsp, nil

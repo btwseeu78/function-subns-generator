@@ -11,16 +11,15 @@ import (
 // This isn't a custom resource, in the sense that we never install its CRD.
 // It is a KRM-like object, so we generate a CRD to describe its schema.
 
-// TODO: Add your input type here! It doesn't need to be called 'RandomGen', you can
+// Object TODO: Add your input type here! It doesn't need to be called 'RandomGen', you can
 // rename it to anything you like.
-
+// Object Defines the structure of input spec
 type Object struct {
-	Name      string `json:"name"`
-	FieldPath string `json:"fieldPath"`
-	//Prefix    string `json:"prefix,omitempty"`
-	//Suffix    string `json:"suffix,omitempty"`
+	Name      string   `json:"name"`
+	FieldPath []string `json:"fieldPath"`
 }
 
+// Config placeholder for inout of the function
 type Config struct {
 	Objs []Object `json:"objs"`
 }
