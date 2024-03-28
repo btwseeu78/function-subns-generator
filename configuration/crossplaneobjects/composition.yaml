@@ -47,3 +47,4 @@ spec:
         - name: customspace
           fieldPath:
           - "spec.forProvider.metadata.name"
+          - "metadata.name"

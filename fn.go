@@ -2,6 +2,10 @@ package main
 
 import (
 	"context"
+
+	"github.com/hashicorp/packer-plugin-sdk/random"
+	"k8s.io/apimachinery/pkg/runtime"
+
 	"github.com/crossplane/crossplane-runtime/pkg/errors"
 	"github.com/crossplane/crossplane-runtime/pkg/fieldpath"
 	"github.com/crossplane/crossplane-runtime/pkg/logging"
@@ -10,8 +14,6 @@ import (
 	"github.com/crossplane/function-sdk-go/resource"
 	"github.com/crossplane/function-sdk-go/response"
 	"github.com/crossplane/function-subns-generator/input/v1beta1"
-	"github.com/hashicorp/packer-plugin-sdk/random"
-	"k8s.io/apimachinery/pkg/runtime"
 )
 
 // Function returns whatever response you ask it to.
@@ -33,6 +35,10 @@ func (f *Function) RunFunction(_ context.Context, req *fnv1beta1.RunFunctionRequ
 		response.Fatal(rsp, errors.Wrapf(err, "cannot get Function input from %T", req))
 		return rsp, nil
 	}
+
+	// id := uuid2.New().String()
+
+	// f.log.Info("Generated UUID FOR", "Observed", observed, "UUID", id)
 	desired, err := request.GetDesiredComposedResources(req)
 
 	if err != nil {
@@ -40,28 +46,19 @@ func (f *Function) RunFunction(_ context.Context, req *fnv1beta1.RunFunctionRequ
 		return rsp, nil
 	}
 
-	f.log.Info("DesiredComposed Resource", "Desired: ", desired, "Req: ", req.GetMeta().GetTag())
-
-	observed, err := request.GetObservedComposedResources(req)
-
-	if err != nil {
-		response.Fatal(rsp, err)
-		return rsp, nil
-	}
-
-	// id := uuid2.New().String()
-
-	// f.log.Info("Generated UUID FOR", "Observed", observed, "UUID", id)
-
 	for _, obj := range in.Cfg.Objs {
+
+		f.log.Info("DesiredComposed Resource", "Desired: ", desired, "Req: ", req.GetMeta().GetTag())
+
+		observed, err := request.GetObservedComposedResources(req)
+
+		if err != nil {
+			response.Fatal(rsp, err)
+			return rsp, nil
+		}
 		for _, fp := range obj.FieldPath {
 			if observed[resource.Name(obj.Name)].Resource != nil {
 				observedPaved, err := fieldpath.PaveObject(observed[resource.Name(obj.Name)].Resource)
-				if err != nil {
-					f.log.Info("Unable to convert to paved object", "Observed", observed, "error: ", err)
-					response.Fatal(rsp, err)
-					return rsp, nil
-				}
 
 				if err != nil {
 					f.log.Info("Unable To Get The Required Field Path", "PavedData:", observedPaved, "FieldPath", obj.FieldPath)
@@ -79,14 +76,15 @@ func (f *Function) RunFunction(_ context.Context, req *fnv1beta1.RunFunctionRequ
 					return rsp, nil
 				}
 			}
-			err := response.SetDesiredComposedResources(rsp, desired)
 
-			if err != nil {
-				response.Warning(rsp, err)
-				f.log.Info("Creating Desired resource failed", "desired", desired, "error", err)
-				return rsp, nil
-			}
 		}
+	}
+	err = response.SetDesiredComposedResources(rsp, desired)
+
+	if err != nil {
+		response.Warning(rsp, err)
+		f.log.Info("Creating Desired resource failed", "desired", desired, "error", err)
+		return rsp, nil
 	}
 
 	return rsp, nil
