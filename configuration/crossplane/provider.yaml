@@ -18,6 +18,19 @@ spec:
   serviceAccountTemplate:
     metadata:
       name: provider-kubernetes
+  deploymentTemplate:
+    spec:
+      selector:
+        matchLabels:
+          pkg.crossplane.io/provider: provider-kubernetes
+          pkg.crossplane.io/revision: provider-kubernetes-83c72134f895
+      replicas: 1
+      template:
+        spec:
+          containers:
+          - name: package-runtime
+            args:
+            - --debug
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding

@@ -3,20 +3,13 @@ apiVersion: pkg.crossplane.io/v1beta1
 kind: Function
 metadata:
   name: function-subns-generator
-  annotations:
-    # This tells crossplane beta render to connect to the function locally.
-    render.crossplane.io/runtime: Development
 spec:
   # This is ignored when using the Development runtime.
-  package: function-subns-generator
-...
+  package: xpkg.upbound.io/linuxarpan/func-subns-generator:v0.0.8-bug
 ---
 apiVersion: pkg.crossplane.io/v1beta1
 kind: Function
 metadata:
   name: function-patch-and-transform
-  annotations:
-    render.crossplane.io/runtime: Docker
 spec:
   package: xpkg.upbound.io/crossplane-contrib/function-patch-and-transform:v0.1.4
-...

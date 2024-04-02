@@ -1,0 +1,8 @@
+apiVersion: arpan.io/v1alpha1
+kind: MySpace
+metadata:
+  name: test4
+  labels:
+    run: team-4
+spec:
+  name: test4

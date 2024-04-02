@@ -56,29 +56,34 @@ func (f *Function) RunFunction(_ context.Context, req *fnv1beta1.RunFunctionRequ
 			response.Fatal(rsp, err)
 			return rsp, nil
 		}
-		for _, fp := range obj.FieldPath {
-			if observed[resource.Name(obj.Name)].Resource != nil {
-				observedPaved, err := fieldpath.PaveObject(observed[resource.Name(obj.Name)].Resource)
-
-				if err != nil {
-					f.log.Info("Unable To Get The Required Field Path", "PavedData:", observedPaved, "FieldPath", obj.FieldPath)
-					response.Fatal(rsp, err)
-					return rsp, nil
-				}
-
-			}
-			if observed[resource.Name(obj.Name)].Resource == nil {
-				err := patchFieldValueToObject(fp, obj.Name+"-"+randomAlphaNum, desired[resource.Name(obj.Name)].Resource)
-
-				if err != nil {
-					response.Warning(rsp, err)
-					f.log.Info("Unable To generate the unstructured conversion", "observed", observed[resource.Name(obj.Name)].Resource, "err", err)
-					return rsp, nil
-				}
+		var getfieldValue string
+		f.log.Info("Line No 60", "Line Count", 60, "Observed", observed)
+		if observed[resource.Name(obj.Name)].Resource != nil {
+			observedPaved, err := fieldpath.PaveObject(observed[resource.Name(obj.Name)].Resource)
+			getfieldValue, err = observedPaved.GetString(obj.FieldPath[0])
+			f.log.Info("Line No 62", "Line Count", 62, "Observed-oaved", getfieldValue, "Desired", desired[resource.Name(obj.Name)].Resource)
+			if err != nil {
+				f.log.Info("Unable To Get The Required Field Path", "PavedData:", observedPaved, "FieldPath", obj.FieldPath)
+				response.Fatal(rsp, err)
+				return rsp, nil
 			}
 
 		}
+		f.log.Info("Line No 74", "Line Count", 70, "Desired", desired[resource.Name(obj.Name)].Resource)
+		if observed[resource.Name(obj.Name)].Resource == nil {
+			for _, fp := range obj.FieldPath {
+				var loop int
+				if getfieldValue == "" {
+					getfieldValue = "blue"
+				}
+				err = patchFieldValueToObject(fp, getfieldValue+"-"+randomAlphaNum, desired[resource.Name(obj.Name)].Resource)
+				loop = loop + 1
+				f.log.Info("Line No 81", "Loop Count", loop, "Desired", desired[resource.Name(obj.Name)].Resource)
+
+			}
+		}
 	}
+	f.log.Info("Line No 82", "rsp : ", rsp, "Desired", desired)
 	err = response.SetDesiredComposedResources(rsp, desired)
 
 	if err != nil {
